@@ -12,13 +12,14 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m obsuser && \
-    chown -R obsuser:obsuser /home/obsuser
+    chown -R obsuser:obsuser /home/obsuser && \
+    usermod -aG sudo obsuser
 
 USER obsuser
 ENV HOME=/home/obsuser
 
 COPY start.sh /start.sh
-RUN chmod +x /start.sh
+RUN sudo chmod +x /start.sh
 
 EXPOSE 5900 6080
 
