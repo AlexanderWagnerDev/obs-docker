@@ -1,4 +1,4 @@
-name: Docker Multi-Platform Build
+name: Docker Image Build
 
 on:
   workflow_dispatch:
