@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM alexanderwagnerdev/ubuntu:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV VNC_PASS=123456
@@ -15,12 +15,12 @@ RUN useradd -m obsuser && \
     chown -R obsuser:obsuser /home/obsuser && \
     usermod -aG sudo obsuser
 
-USER obsuser
-ENV HOME=/home/obsuser
-
 COPY start.sh /start.sh
 RUN sudo chmod +x /start.sh
 
 EXPOSE 5900 6080
+
+USER obsuser
+ENV HOME=/home/obsuser
 
 CMD ["/start.sh"]
