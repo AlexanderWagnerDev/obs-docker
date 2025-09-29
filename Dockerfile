@@ -1,7 +1,7 @@
 FROM alexanderwagnerdev/ubuntu:latest
 
+ARG VNC_PASS
 ENV DEBIAN_FRONTEND=noninteractive
-ENV VNC_PASS=123456
 
 RUN apt-get update && \
     apt-get upgrade -y && \
@@ -11,16 +11,14 @@ RUN apt-get update && \
     apt-get install -y obs-studio && \
     rm -rf /var/lib/apt/lists/*
 
-RUN useradd -m obsuser && \
-    chown -R obsuser:obsuser /home/obsuser && \
-    usermod -aG sudo obsuser
-
-COPY start.sh /start.sh
-RUN sudo chmod +x /start.sh
+RUN useradd -m obsuser
+COPY --chown=obsuser:obsuser start.sh /home/obsuser/start.sh
+RUN chmod +x /home/obsuser/start.sh
 
 EXPOSE 5900 6080
+HEALTHCHECK CMD curl --fail http://localhost:6080/ || exit 1
 
 USER obsuser
 ENV HOME=/home/obsuser
 
-CMD ["/start.sh"]
+CMD ["/home/obsuser/start.sh"]
