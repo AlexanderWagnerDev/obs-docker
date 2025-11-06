@@ -16,7 +16,6 @@ echo "=========================================="
 export XDG_RUNTIME_DIR=/tmp/runtime-$(id -u)
 export WLR_BACKENDS=headless
 export WLR_LIBINPUT_NO_DEVICES=1
-export WAYLAND_DISPLAY=wayland-0
 export WLR_RENDERER_ALLOW_SOFTWARE=1
 
 mkdir -p $XDG_RUNTIME_DIR
@@ -35,16 +34,29 @@ if ! ps -p $SWAY_PID > /dev/null; then
   exit 1
 fi
 
-if [ ! -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; then
-  echo "ERROR: Wayland socket not found at $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY"
-  echo "Available sockets:"
+echo "Searching for Wayland socket..."
+WAYLAND_SOCKET=$(ls -1 $XDG_RUNTIME_DIR/wayland-* 2>/dev/null | grep -v '.lock$' | head -n1)
+
+if [[ -z "$WAYLAND_SOCKET" ]]; then
+  echo "ERROR: No Wayland socket found in $XDG_RUNTIME_DIR"
+  echo "Available files:"
   ls -la $XDG_RUNTIME_DIR/
   echo "=== Sway Log ==="
   cat /tmp/sway.log
   exit 1
 fi
 
-echo "✓ Sway started successfully"
+export WAYLAND_DISPLAY=$(basename "$WAYLAND_SOCKET")
+echo "✓ Found Wayland socket: $WAYLAND_DISPLAY"
+
+if [ ! -S "$WAYLAND_SOCKET" ]; then
+  echo "ERROR: $WAYLAND_SOCKET is not a valid socket"
+  echo "Available sockets:"
+  ls -la $XDG_RUNTIME_DIR/
+  exit 1
+fi
+
+echo "✓ Sway started successfully with display: $WAYLAND_DISPLAY"
 
 sleep 3
 
@@ -98,6 +110,7 @@ echo "VNC Access:    localhost:5900"
 echo "Web Access:    http://localhost:6080"
 echo "Username:      obsuser"
 echo "Password:      [hidden]"
+echo "Wayland Display: $WAYLAND_DISPLAY"
 echo "=========================================="
 echo ""
 echo "Monitoring logs..."
