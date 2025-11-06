@@ -36,6 +36,9 @@ fi
 
 echo "✓ Xvfb started successfully on display $DISPLAY"
 
+echo "Setting keyboard layout..."
+setxkbmap de 2>/dev/null || setxkbmap us 2>/dev/null || echo "WARNING: Could not set keyboard layout"
+
 echo "Starting D-Bus session..."
 eval $(dbus-launch --sh-syntax)
 export DBUS_SESSION_BUS_ADDRESS
@@ -75,8 +78,10 @@ fi
 
 echo "✓ LXQt session started"
 
-echo "Starting x11vnc with password protection..."
-x11vnc -display $DISPLAY -forever -shared -rfbport 5900 -passwd "$VNC_PASS" -xkb > /tmp/x11vnc.log 2>&1 &
+sleep 3
+
+echo "Starting x11vnc with password protection and caching..."
+x11vnc -display $DISPLAY -forever -shared -rfbport 5900 -passwd "$VNC_PASS" -xkb -ncache 10 -ncache_cr > /tmp/x11vnc.log 2>&1 &
 X11VNC_PID=$!
 
 sleep 3
@@ -88,7 +93,7 @@ if ! ps -p $X11VNC_PID > /dev/null; then
 fi
 
 if ss -tuln | grep -q ':5900'; then
-  echo "✓ x11vnc started successfully on port 5900 (password protected)"
+  echo "✓ x11vnc started successfully on port 5900 (password protected, caching enabled)"
 else
   echo "WARNING: x11vnc not listening on port 5900"
   cat /tmp/x11vnc.log
@@ -119,6 +124,7 @@ echo "Display:       $DISPLAY"
 echo "Resolution:    $RESOLUTION"
 echo "Locale:        $LANG"
 echo "Timezone:      $TZ"
+echo "VNC Caching:   Enabled (ncache 10)"
 echo "=========================================="
 echo ""
 echo "Monitoring logs..."
