@@ -118,6 +118,7 @@ echo ""
 echo "=========================================="
 echo "✓ Setup complete!"
 echo "=========================================="
+echo "OBS Docker by AlexanderWagnerDev"
 echo "VNC Access:    localhost:5900"
 echo "VNC Password:  *** (set via VNC_PASS)"
 echo "Web Access:    http://localhost:6080"
@@ -126,11 +127,7 @@ echo "Display:       $DISPLAY"
 echo "Resolution:    $RESOLUTION"
 echo "Locale:        $LANG"
 echo "Timezone:      $TZ"
-echo "VNC Caching:   Enabled (ncache 10)"
 echo "=========================================="
 echo ""
-echo "Monitoring logs..."
-
-tail -f /tmp/*.log &
 
 wait
