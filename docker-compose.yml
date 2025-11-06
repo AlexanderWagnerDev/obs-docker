@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  obs-docker:
+    image: alexanderwagnerdev/obs-docker:latest
+    container_name: obs-docker
+    restart: unless-stopped
+    environment:
+      - VNC_PASS=${VNC_PASS}
+      - LOCALE=${LOCALE}
+      - TZ=${TZ}
+      - KEYBOARD_LAYOUT=${KEYBOARD_LAYOUT}
+    ports:
+      - "5900:5900"
+      - "6080:6080"
+    shm_size: '8gb'
+    tmpfs:
+      - /tmp:exec,mode=1777
