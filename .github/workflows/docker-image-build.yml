@@ -39,5 +39,7 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
+            alexanderwagnerdev/obs-docker:latest
             alexanderwagnerdev/obs-docker:main
+            ghcr.io/alexanderwagnerdev/obs-docker:latest
             ghcr.io/alexanderwagnerdev/obs-docker:main
