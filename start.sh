@@ -57,6 +57,9 @@ fi
 
 echo "✓ Weston started successfully with display: $WAYLAND_DISPLAY"
 
+export QT_QPA_PLATFORM=wayland
+export QT_WAYLAND_DISABLE_WINDOWDECORATION=0
+
 echo "Starting LXQt session..."
 startlxqt > /tmp/lxqt.log 2>&1 &
 LXQT_PID=$!
@@ -65,6 +68,7 @@ sleep 5
 
 if ! ps -p $LXQT_PID > /dev/null; then
   echo "WARNING: LXQt may have backgrounded, checking processes..."
+  cat /tmp/lxqt.log
 fi
 
 echo "✓ LXQt session started"
