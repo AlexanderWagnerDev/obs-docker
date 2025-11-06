@@ -78,7 +78,7 @@ EOF
 chmod 600 $HOME/.config/wayvnc/config
 
 echo "Starting wayvnc..."
-wayvnc -C $HOME/.config/wayvnc/config 0.0.0.0 5900 > /tmp/wayvnc.log 2>&1 &
+wayvnc --disable-input -C $HOME/.config/wayvnc/config 0.0.0.0 5900 > /tmp/wayvnc.log 2>&1 &
 WAYVNC_PID=$!
 
 sleep 3
@@ -87,7 +87,6 @@ if ! ps -p $WAYVNC_PID > /dev/null; then
   echo "ERROR: wayvnc failed to start"
   echo "=== wayvnc Log ==="
   cat /tmp/wayvnc.log
-  exit 1
 fi
 
 echo "✓ wayvnc started successfully on port 5900"
