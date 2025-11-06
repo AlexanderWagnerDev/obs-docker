@@ -8,6 +8,11 @@ if [[ -z "$VNC_PASS" ]]; then
   exit 1
 fi
 
+if [[ -n "$TZ" ]]; then
+  sudo ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
+  echo $TZ | sudo tee /etc/timezone > /dev/null
+fi
+
 echo "=========================================="
 echo "Starting LXQt Container with XWayland"
 echo "User: $(whoami) (UID: $(id -u))"
@@ -74,6 +79,11 @@ if ! ps -p $LXQT_PID > /dev/null; then
 fi
 
 echo "✓ LXQt session started"
+
+echo "Starting clipboard sync..."
+autocutsel -fork
+autocutsel -selection PRIMARY -fork
+echo "✓ Clipboard sync started"
 
 sleep 3
 
