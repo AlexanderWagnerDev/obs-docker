@@ -4,14 +4,20 @@ set -e
 sudo cron &
 
 if [[ -z "$VNC_PASS" ]]; then
-  echo "VNC_PASS not set!"
+  echo "ERROR: VNC_PASS not set!"
   exit 1
 fi
 
 echo "=========================================="
 echo "Starting LXQt Container with XWayland"
 echo "User: $(whoami) (UID: $(id -u))"
+echo "Locale: $LANG"
+echo "Timezone: $TZ"
 echo "=========================================="
+
+export XDG_RUNTIME_DIR=/tmp/runtime-$(id -u)
+mkdir -p $XDG_RUNTIME_DIR
+chmod 700 $XDG_RUNTIME_DIR
 
 export DISPLAY=:99
 export RESOLUTION=1920x1080x24
@@ -35,6 +41,16 @@ eval $(dbus-launch --sh-syntax)
 export DBUS_SESSION_BUS_ADDRESS
 export DBUS_SESSION_BUS_PID
 
+echo "Starting PulseAudio..."
+pulseaudio --start --exit-idle-time=-1 > /tmp/pulseaudio.log 2>&1 &
+sleep 2
+
+if pgrep -u $(id -u) pulseaudio > /dev/null; then
+  echo "✓ PulseAudio started"
+else
+  echo "WARNING: PulseAudio may not be running"
+fi
+
 echo "Starting Openbox window manager..."
 openbox > /tmp/openbox.log 2>&1 &
 OPENBOX_PID=$!
@@ -43,7 +59,6 @@ sleep 2
 
 if ! ps -p $OPENBOX_PID > /dev/null; then
   echo "WARNING: Openbox may have backgrounded"
-  cat /tmp/openbox.log
 fi
 
 echo "✓ Openbox started"
@@ -56,15 +71,14 @@ sleep 5
 
 if ! ps -p $LXQT_PID > /dev/null; then
   echo "WARNING: LXQt may have backgrounded, checking processes..."
-  cat /tmp/lxqt.log
 fi
 
 echo "✓ LXQt session started"
 
 sleep 3
 
-echo "Starting x11vnc..."
-x11vnc -display $DISPLAY -forever -shared -rfbport 5900 -nopw -xkb > /tmp/x11vnc.log 2>&1 &
+echo "Starting x11vnc with password protection..."
+x11vnc -display $DISPLAY -forever -shared -rfbport 5900 -passwd "$VNC_PASS" -xkb > /tmp/x11vnc.log 2>&1 &
 X11VNC_PID=$!
 
 sleep 3
@@ -76,7 +90,7 @@ if ! ps -p $X11VNC_PID > /dev/null; then
 fi
 
 if ss -tuln | grep -q ':5900'; then
-  echo "✓ x11vnc started successfully on port 5900"
+  echo "✓ x11vnc started successfully on port 5900 (password protected)"
 else
   echo "WARNING: x11vnc not listening on port 5900"
   cat /tmp/x11vnc.log
@@ -100,10 +114,13 @@ echo "=========================================="
 echo "✓ Setup complete!"
 echo "=========================================="
 echo "VNC Access:    localhost:5900"
+echo "VNC Password:  *** (set via VNC_PASS)"
 echo "Web Access:    http://localhost:6080"
 echo "Desktop:       LXQt on X11 (via Xvfb)"
 echo "Display:       $DISPLAY"
 echo "Resolution:    $RESOLUTION"
+echo "Locale:        $LANG"
+echo "Timezone:      $TZ"
 echo "=========================================="
 echo ""
 echo "Monitoring logs..."
