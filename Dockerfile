@@ -16,7 +16,7 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
     software-properties-common wget curl git gnupg \
-    xwayland x11vnc xvfb \
+    xwayland x11vnc xvfb x11-xkb-utils \
     lxqt-core lxqt-session lxqt-panel lxqt-runner lxqt-config \
     pcmanfm-qt qterminal \
     websockify novnc \
