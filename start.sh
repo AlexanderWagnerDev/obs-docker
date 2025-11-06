@@ -9,50 +9,44 @@ if [[ -z "$VNC_PASS" ]]; then
 fi
 
 echo "=========================================="
-echo "Starting LXQt Container with Wayfire"
+echo "Starting LXQt Container with XWayland"
 echo "User: $(whoami) (UID: $(id -u))"
 echo "=========================================="
 
-export XDG_RUNTIME_DIR=/tmp/runtime-$(id -u)
-export WAYLAND_DISPLAY=wayland-0
+export DISPLAY=:99
+export RESOLUTION=1920x1080x24
 
-mkdir -p $XDG_RUNTIME_DIR
-chmod 700 $XDG_RUNTIME_DIR
+echo "Starting Xvfb..."
+Xvfb $DISPLAY -screen 0 ${RESOLUTION} -ac +extension GLX +render -noreset > /tmp/xvfb.log 2>&1 &
+XVFB_PID=$!
+
+sleep 3
+
+if ! ps -p $XVFB_PID > /dev/null; then
+  echo "ERROR: Xvfb failed to start"
+  cat /tmp/xvfb.log
+  exit 1
+fi
+
+echo "✓ Xvfb started successfully on display $DISPLAY"
 
 echo "Starting D-Bus session..."
 eval $(dbus-launch --sh-syntax)
 export DBUS_SESSION_BUS_ADDRESS
 export DBUS_SESSION_BUS_PID
 
-echo "Starting Wayfire..."
-wayfire > /tmp/wayfire.log 2>&1 &
-WAYFIRE_PID=$!
+echo "Starting Openbox window manager..."
+openbox > /tmp/openbox.log 2>&1 &
+OPENBOX_PID=$!
 
-sleep 5
+sleep 2
 
-if ! ps -p $WAYFIRE_PID > /dev/null; then
-  echo "ERROR: Wayfire failed to start"
-  echo "=== Wayfire Log ==="
-  cat /tmp/wayfire.log
-  exit 1
+if ! ps -p $OPENBOX_PID > /dev/null; then
+  echo "WARNING: Openbox may have backgrounded"
+  cat /tmp/openbox.log
 fi
 
-WAYLAND_SOCKET=$(ls -1 $XDG_RUNTIME_DIR/wayland-* 2>/dev/null | grep -v '.lock$' | head -n1)
-
-if [[ -z "$WAYLAND_SOCKET" ]]; then
-  echo "ERROR: Kein Wayland Socket gefunden in $XDG_RUNTIME_DIR"
-  echo "Available files:"
-  ls -la $XDG_RUNTIME_DIR/
-  echo "=== Wayfire Log ==="
-  cat /tmp/wayfire.log
-  exit 1
-fi
-
-export WAYLAND_DISPLAY=$(basename "$WAYLAND_SOCKET")
-echo "✓ Gefundener Wayland Socket: $WAYLAND_DISPLAY"
-
-export QT_QPA_PLATFORM=wayland
-export QT_WAYLAND_DISABLE_WINDOWDECORATION=0
+echo "✓ Openbox started"
 
 echo "Starting LXQt..."
 startlxqt > /tmp/lxqt.log 2>&1 &
@@ -65,36 +59,27 @@ if ! ps -p $LXQT_PID > /dev/null; then
   cat /tmp/lxqt.log
 fi
 
-echo "✓ LXQt gestartet"
+echo "✓ LXQt session started"
 
 sleep 3
 
-mkdir -p $HOME/.config/wayvnc
-cat > $HOME/.config/wayvnc/config << EOF
-address=0.0.0.0
-enable_auth=false
-EOF
-chmod 600 $HOME/.config/wayvnc/config
-
-echo "Starting wayvnc..."
-wayvnc --disable-input -C $HOME/.config/wayvnc/config 0.0.0.0 5900 > /tmp/wayvnc.log 2>&1 &
-WAYVNC_PID=$!
+echo "Starting x11vnc..."
+x11vnc -display $DISPLAY -forever -shared -rfbport 5900 -nopw -xkb > /tmp/x11vnc.log 2>&1 &
+X11VNC_PID=$!
 
 sleep 3
 
-if ! ps -p $WAYVNC_PID > /dev/null; then
-  echo "ERROR: wayvnc failed to start"
-  echo "=== wayvnc Log ==="
-  cat /tmp/wayvnc.log
+if ! ps -p $X11VNC_PID > /dev/null; then
+  echo "ERROR: x11vnc failed to start"
+  cat /tmp/x11vnc.log
   exit 1
 fi
 
 if ss -tuln | grep -q ':5900'; then
-  echo "✓ wayvnc started successfully on port 5900"
+  echo "✓ x11vnc started successfully on port 5900"
 else
-  echo "WARNING: wayvnc not listening on port 5900"
-  echo "=== wayvnc Log ==="
-  cat /tmp/wayvnc.log
+  echo "WARNING: x11vnc not listening on port 5900"
+  cat /tmp/x11vnc.log
 fi
 
 if command -v /usr/share/novnc/utils/novnc_proxy >/dev/null 2>&1; then
@@ -116,8 +101,9 @@ echo "✓ Setup complete!"
 echo "=========================================="
 echo "VNC Access:    localhost:5900"
 echo "Web Access:    http://localhost:6080"
-echo "Desktop:       LXQt on Wayland (Wayfire)"
-echo "Wayland Display: $WAYLAND_DISPLAY"
+echo "Desktop:       LXQt on X11 (via Xvfb)"
+echo "Display:       $DISPLAY"
+echo "Resolution:    $RESOLUTION"
 echo "=========================================="
 echo ""
 echo "Monitoring logs..."
