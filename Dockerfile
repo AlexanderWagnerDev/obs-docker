@@ -1,6 +1,6 @@
 FROM alexanderwagnerdev/ubuntu:autoupdate
 
-ARG VNC_PASS
+ARG VNC_PASS=OBS1234!
 ARG LOCALE=de_DE.UTF-8
 ARG TZ=Europe/Berlin
 
