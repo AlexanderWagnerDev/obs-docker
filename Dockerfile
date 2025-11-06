@@ -7,7 +7,7 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
     software-properties-common wget curl git gnupg \
-    sway waybar wayvnc \
+    sway waybar wayvnc xwayland \
     websockify python3-pip novnc \
     v4l2loopback-dkms ffmpeg \
     libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev \
@@ -39,6 +39,9 @@ EOF
 
 RUN chown -R obsuser:obsuser /home/obsuser/.config/sway
 
+RUN mkdir -p /home/obsuser/.config/obs-studio \
+    && chown -R obsuser:obsuser /home/obsuser
+
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
@@ -46,6 +49,5 @@ USER obsuser
 WORKDIR /home/obsuser
 
 EXPOSE 5900 6080
-HEALTHCHECK CMD curl --fail http://localhost:6080/ || exit 1
 
 CMD ["/start.sh"]
