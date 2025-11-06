@@ -84,7 +84,7 @@ EOF
 chmod 600 $HOME/.config/wayvnc/config
 
 echo "Starting wayvnc..."
-wayvnc --disable-input -C $HOME/.config/wayvnc/config 0.0.0.0 5900 > /tmp/wayvnc.log 2>&1 &
+wayvnc --disable-screencopy --disable-input -C $HOME/.config/wayvnc/config 0.0.0.0 5900 > /tmp/wayvnc.log 2>&1 &
 WAYVNC_PID=$!
 
 sleep 3
