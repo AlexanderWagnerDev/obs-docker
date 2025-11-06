@@ -20,15 +20,15 @@ RUN apt-get update && \
     lxqt-core lxqt-session lxqt-panel lxqt-runner lxqt-config \
     pcmanfm-qt qterminal \
     websockify novnc \
-    ffmpeg firefox python3-pip vlc vlc-l10n v4l2loopback-dkms \
+    ffmpeg firefox chromium-browser python3-pip vlc vlc-l10n v4l2loopback-dkms \
     gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
     gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools \
     gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-pulseaudio \
     mesa-utils libgl1-mesa-dri \
-    fonts-dejavu fonts-noto fonts-freefont-ttf fonts-liberation \
+    fonts-dejavu fonts-noto fonts-freefont-ttf fonts-liberation fonts-roboto fonts-ubuntu fontconfig \
     dbus-x11 \
     openbox \
-    pulseaudio pulseaudio-utils \
+    pulseaudio pulseaudio-utils pulseaudio-module-loopback pavucontrol \
     locales \
     iproute2 \
     nano vim htop net-tools iputils-ping \
