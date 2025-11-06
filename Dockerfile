@@ -31,7 +31,6 @@ RUN apt-get update && \
     pulseaudio pulseaudio-utils pavucontrol \
     locales \
     iproute2 \
-    xclip autocutsel \
     nano vim htop net-tools iputils-ping \
     sudo \
     && \
