@@ -9,28 +9,31 @@ if [[ -z "$VNC_PASS" ]]; then
 fi
 
 echo "=========================================="
-echo "Starting OBS Wayland Container with Sway"
+echo "Starting LXQt Container with Weston"
 echo "User: $(whoami) (UID: $(id -u))"
 echo "=========================================="
 
 export XDG_RUNTIME_DIR=/tmp/runtime-$(id -u)
-export WLR_BACKENDS=headless
-export WLR_LIBINPUT_NO_DEVICES=1
-export WLR_RENDERER_ALLOW_SOFTWARE=1
+export WAYLAND_DISPLAY=wayland-0
 
 mkdir -p $XDG_RUNTIME_DIR
 chmod 700 $XDG_RUNTIME_DIR
 
-echo "Starting Sway compositor..."
-sway --unsupported-gpu > /tmp/sway.log 2>&1 &
-SWAY_PID=$!
+echo "Starting D-Bus session..."
+eval $(dbus-launch --sh-syntax)
+export DBUS_SESSION_BUS_ADDRESS
+export DBUS_SESSION_BUS_PID
+
+echo "Starting Weston compositor..."
+weston --backend=headless-backend.so --width=1920 --height=1080 > /tmp/weston.log 2>&1 &
+WESTON_PID=$!
 
 sleep 5
 
-if ! ps -p $SWAY_PID > /dev/null; then
-  echo "ERROR: Sway failed to start"
-  echo "=== Sway Log ==="
-  cat /tmp/sway.log
+if ! ps -p $WESTON_PID > /dev/null; then
+  echo "ERROR: Weston failed to start"
+  echo "=== Weston Log ==="
+  cat /tmp/weston.log
   exit 1
 fi
 
@@ -41,8 +44,6 @@ if [[ -z "$WAYLAND_SOCKET" ]]; then
   echo "ERROR: No Wayland socket found in $XDG_RUNTIME_DIR"
   echo "Available files:"
   ls -la $XDG_RUNTIME_DIR/
-  echo "=== Sway Log ==="
-  cat /tmp/sway.log
   exit 1
 fi
 
@@ -51,30 +52,28 @@ echo "✓ Found Wayland socket: $WAYLAND_DISPLAY"
 
 if [ ! -S "$WAYLAND_SOCKET" ]; then
   echo "ERROR: $WAYLAND_SOCKET is not a valid socket"
-  echo "Available sockets:"
-  ls -la $XDG_RUNTIME_DIR/
   exit 1
 fi
 
-echo "✓ Sway started successfully with display: $WAYLAND_DISPLAY"
+echo "✓ Weston started successfully with display: $WAYLAND_DISPLAY"
 
-sleep 3
+echo "Starting LXQt session..."
+startlxqt > /tmp/lxqt.log 2>&1 &
+LXQT_PID=$!
 
-if pgrep -x "obs" > /dev/null; then
-  echo "✓ OBS started successfully via Sway"
-else
-  echo "WARNING: OBS not running, starting manually..."
-  obs --platform wayland > /tmp/obs.log 2>&1 &
-  sleep 2
+sleep 5
+
+if ! ps -p $LXQT_PID > /dev/null; then
+  echo "WARNING: LXQt may have backgrounded, checking processes..."
 fi
+
+echo "✓ LXQt session started"
 
 echo "Configuring wayvnc..."
 mkdir -p $HOME/.config/wayvnc
 cat > $HOME/.config/wayvnc/config << EOF
 address=0.0.0.0
 enable_auth=false
-#username=obsuser
-#password=$VNC_PASS
 EOF
 chmod 600 $HOME/.config/wayvnc/config
 
@@ -88,8 +87,6 @@ if ! ps -p $WAYVNC_PID > /dev/null; then
   echo "ERROR: wayvnc failed to start"
   echo "=== wayvnc Log ==="
   cat /tmp/wayvnc.log
-  echo "=== Available Wayland outputs ==="
-  wayvnc --list-outputs 2>&1 || true
   exit 1
 fi
 
@@ -108,8 +105,7 @@ echo "✓ Setup complete!"
 echo "=========================================="
 echo "VNC Access:    localhost:5900"
 echo "Web Access:    http://localhost:6080"
-echo "Username:      obsuser"
-echo "Password:      [hidden]"
+echo "Desktop:       LXQt on Wayland (Weston)"
 echo "Wayland Display: $WAYLAND_DISPLAY"
 echo "=========================================="
 echo ""
