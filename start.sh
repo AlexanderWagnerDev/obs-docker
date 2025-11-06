@@ -14,7 +14,7 @@ echo "User: $(whoami) (UID: $(id -u))"
 echo "=========================================="
 
 export XDG_RUNTIME_DIR=/tmp/runtime-$(id -u)
-export WAYLAND_DISPLAY=wayfire-0
+export WAYLAND_DISPLAY=wayland-0
 
 mkdir -p $XDG_RUNTIME_DIR
 chmod 700 $XDG_RUNTIME_DIR
@@ -25,20 +25,34 @@ export DBUS_SESSION_BUS_ADDRESS
 export DBUS_SESSION_BUS_PID
 
 echo "Starting Wayfire..."
-wayfire --no-use-wayland --server --width=1920 --height=1080 > /tmp/wayfire.log 2>&1 &
+wayfire > /tmp/wayfire.log 2>&1 &
 WAYFIRE_PID=$!
 
 sleep 5
 
-WAYLAND_SOCKET=$(ls -1 $XDG_RUNTIME_DIR/wayfire-*.socket 2>/dev/null | head -n1)
-
-if [[ -z "$WAYLAND_SOCKET" ]]; then
-  echo "ERROR: Kein Wayfire Socket gefunden."
+if ! ps -p $WAYFIRE_PID > /dev/null; then
+  echo "ERROR: Wayfire failed to start"
+  echo "=== Wayfire Log ==="
+  cat /tmp/wayfire.log
   exit 1
 fi
 
-export WAYLAND_DISPLAY=$(basename "$WAYLAND_SOCKET" .socket)
+WAYLAND_SOCKET=$(ls -1 $XDG_RUNTIME_DIR/wayland-* 2>/dev/null | grep -v '.lock$' | head -n1)
+
+if [[ -z "$WAYLAND_SOCKET" ]]; then
+  echo "ERROR: Kein Wayland Socket gefunden in $XDG_RUNTIME_DIR"
+  echo "Available files:"
+  ls -la $XDG_RUNTIME_DIR/
+  echo "=== Wayfire Log ==="
+  cat /tmp/wayfire.log
+  exit 1
+fi
+
+export WAYLAND_DISPLAY=$(basename "$WAYLAND_SOCKET")
 echo "✓ Gefundener Wayland Socket: $WAYLAND_DISPLAY"
+
+export QT_QPA_PLATFORM=wayland
+export QT_WAYLAND_DISABLE_WINDOWDECORATION=0
 
 echo "Starting LXQt..."
 startlxqt > /tmp/lxqt.log 2>&1 &
@@ -47,11 +61,13 @@ LXQT_PID=$!
 sleep 5
 
 if ! ps -p $LXQT_PID > /dev/null; then
-  echo "WARNING: LXQt Background-Apps oder Fehler..."
+  echo "WARNING: LXQt may have backgrounded, checking processes..."
   cat /tmp/lxqt.log
 fi
 
 echo "✓ LXQt gestartet"
+
+sleep 3
 
 mkdir -p $HOME/.config/wayvnc
 cat > $HOME/.config/wayvnc/config << EOF
@@ -67,26 +83,44 @@ WAYVNC_PID=$!
 sleep 3
 
 if ! ps -p $WAYVNC_PID > /dev/null; then
-  echo "ERROR: wayvnc nicht gestartet"
+  echo "ERROR: wayvnc failed to start"
+  echo "=== wayvnc Log ==="
   cat /tmp/wayvnc.log
   exit 1
 fi
 
-echo "Starting noVNC..."
-/usr/share/novnc/utils/novnc_proxy --web /usr/share/novnc --vnc localhost:5900 --listen 6080 > /tmp/novnc.log 2>&1 &
-sleep 2
-
-if ss -tuln | grep -q ':6080'; then
-  echo "✓ noVNC läuft auf Port 6080"
+if ss -tuln | grep -q ':5900'; then
+  echo "✓ wayvnc started successfully on port 5900"
 else
-  echo "ERROR: noVNC läuft nicht"
-  cat /tmp/novnc.log
+  echo "WARNING: wayvnc not listening on port 5900"
+  echo "=== wayvnc Log ==="
+  cat /tmp/wayvnc.log
 fi
 
-echo "Setup abgeschlossen!"
-echo "VNC: localhost:5900"
-echo "Web: http://localhost:6080"
-echo "Wayfire auf Wayland: $WAYLAND_DISPLAY"
+if command -v /usr/share/novnc/utils/novnc_proxy >/dev/null 2>&1; then
+  echo "Starting noVNC..."
+  /usr/share/novnc/utils/novnc_proxy --web /usr/share/novnc --vnc localhost:5900 --listen 6080 > /tmp/novnc.log 2>&1 &
+  sleep 2
+  
+  if ss -tuln | grep -q ':6080'; then
+    echo "✓ noVNC started on port 6080"
+  else
+    echo "ERROR: noVNC failed to bind to port 6080"
+    cat /tmp/novnc.log
+  fi
+fi
+
+echo ""
+echo "=========================================="
+echo "✓ Setup complete!"
+echo "=========================================="
+echo "VNC Access:    localhost:5900"
+echo "Web Access:    http://localhost:6080"
+echo "Desktop:       LXQt on Wayland (Wayfire)"
+echo "Wayland Display: $WAYLAND_DISPLAY"
+echo "=========================================="
+echo ""
+echo "Monitoring logs..."
 
 tail -f /tmp/*.log &
 
