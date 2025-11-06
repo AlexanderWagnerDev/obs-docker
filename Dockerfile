@@ -1,5 +1,6 @@
 FROM alexanderwagnerdev/ubuntu:autoupdate
 
+ARG VNC_PASS
 ENV VNC_PASS=${VNC_PASS}
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -7,7 +8,9 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
     software-properties-common wget curl git gnupg \
-    sway waybar wayvnc xwayland \
+    weston wayvnc xwayland \
+    lxqt-core lxqt-session lxqt-panel lxqt-runner lxqt-config \
+    pcmanfm-qt qterminal \
     websockify python3-pip novnc \
     v4l2loopback-dkms ffmpeg vlc vlc-l10n firefox \
     libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev \
@@ -15,6 +18,8 @@ RUN apt-get update && \
     gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools \
     gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-pulseaudio \
     mesa-utils libgl1-mesa-dri \
+    fonts-dejavu fonts-noto fonts-freefont-ttf fonts-liberation \
+    dbus-x11 \
     sudo \
     && \
     add-apt-repository ppa:obsproject/obs-studio -y && \
@@ -24,24 +29,35 @@ RUN apt-get update && \
 
 RUN useradd -m -s /bin/bash -u 1500 obsuser && \
     echo "obsuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
-    mkdir -p /home/obsuser/.config/sway && \
+    mkdir -p /home/obsuser/.config/obs-studio && \
     chown -R obsuser:obsuser /home/obsuser
 
-RUN cat > /home/obsuser/.config/sway/config << 'EOF'
-xwayland enable
+RUN mkdir -p /home/obsuser/.config && \
+    cat > /home/obsuser/.config/weston.ini << 'EOF'
+[core]
+backend=headless-backend.so
+idle-time=0
 
-output * {
-    mode 1920x1080
-}
+[output]
+name=HEADLESS-1
+mode=1920x1080
 
-exec obs --platform wayland
-exec firefox
+[shell]
+panel-position=top
 EOF
 
-RUN chown -R obsuser:obsuser /home/obsuser/.config/sway
+RUN chown -R obsuser:obsuser /home/obsuser/.config
 
-RUN mkdir -p /home/obsuser/.config/obs-studio \
-    && chown -R obsuser:obsuser /home/obsuser
+RUN mkdir -p /home/obsuser/.config/autostart && \
+    cat > /home/obsuser/.config/autostart/obs.desktop << 'EOF'
+[Desktop Entry]
+Type=Application
+Name=OBS Studio
+Exec=obs --platform wayland
+X-LXQt-Need-Tray=false
+EOF
+
+RUN chown -R obsuser:obsuser /home/obsuser/.config/autostart
 
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
@@ -50,5 +66,6 @@ USER obsuser
 WORKDIR /home/obsuser
 
 EXPOSE 5900 6080
+HEALTHCHECK CMD curl --fail http://localhost:6080/ || exit 1
 
 CMD ["/start.sh"]
