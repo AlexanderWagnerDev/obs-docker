@@ -72,9 +72,9 @@ echo "Configuring wayvnc..."
 mkdir -p $HOME/.config/wayvnc
 cat > $HOME/.config/wayvnc/config << EOF
 address=0.0.0.0
-enable_auth=true
-username=obsuser
-password=$VNC_PASS
+enable_auth=false
+#username=obsuser
+#password=$VNC_PASS
 EOF
 chmod 600 $HOME/.config/wayvnc/config
 
