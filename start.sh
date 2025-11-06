@@ -1,12 +1,12 @@
 #!/bin/bash
 set -e
 
-cron
-
-export XDG_RUNTIME_DIR=/tmp/runtime-root
+export XDG_RUNTIME_DIR=/tmp/runtime-$(id -u)
 export WLR_BACKENDS=headless
 export WLR_LIBINPUT_NO_DEVICES=1
 export WAYLAND_DISPLAY=wayland-0
+
+cron &
 
 mkdir -p $XDG_RUNTIME_DIR
 chmod 700 $XDG_RUNTIME_DIR
@@ -15,6 +15,8 @@ if [[ -z "$VNC_PASS" ]]; then
   echo "VNC_PASS not set!"
   exit 1
 fi
+
+echo "Starting as user: $(whoami) (UID: $(id -u))"
 
 sway --unsupported-gpu > /tmp/sway.log 2>&1 &
 sleep 3
