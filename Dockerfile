@@ -20,7 +20,6 @@ RUN apt-get update && \
     fonts-dejavu fonts-noto fonts-freefont-ttf fonts-liberation \
     dbus-x11 \
     qtwayland5 libqt5waylandclient5 \
-    wlroots \
     sudo \
     && \
     add-apt-repository ppa:obsproject/obs-studio -y && \
