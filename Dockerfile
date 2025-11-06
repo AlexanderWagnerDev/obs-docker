@@ -11,20 +11,15 @@ RUN apt-get update && \
     weston wayvnc xwayland \
     lxqt-core lxqt-session lxqt-panel lxqt-runner lxqt-config \
     pcmanfm-qt qterminal \
-    websockify python3-pip novnc \
-    v4l2loopback-dkms ffmpeg vlc vlc-l10n firefox \
-    libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev \
+    websockify novnc \
+    ffmpeg firefox python3-pip vlc vlc-l10 v4l2loopback-dkms \
     gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
     gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools \
     gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-pulseaudio \
     mesa-utils libgl1-mesa-dri \
     fonts-dejavu fonts-noto fonts-freefont-ttf fonts-liberation \
-    fonts-ubuntu fonts-droid-fallback fonts-noto-mono fonts-noto-cjk \
     dbus-x11 \
-    qt5-qmake qtwayland5 libqt5waylandclient5 libqt5waylandcompositor5 \
-    libxcb1 libxcb-xkb1 libxcb-render0 libxcb-shape0 libxcb-randr0 \
-    libxcb-xfixes0 libxcb-sync1 libxcb-shm0 libxcb-icccm4 libxcb-keysyms1 \
-    libxcb-image0 libxcb-util1 libx11-xcb1 libxkbcommon-x11-0 \
+    qtwayland5 libqt5waylandclient5 \
     sudo \
     && \
     add-apt-repository ppa:obsproject/obs-studio -y && \
