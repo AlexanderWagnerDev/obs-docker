@@ -23,7 +23,7 @@ RUN apt-get update && \
     apt-get install -y obs-studio && \
     rm -rf /var/lib/apt/lists/*
 
-RUN useradd -m -s /bin/bash -u 1000 obsuser && \
+RUN useradd -m -s /bin/bash -u 1500 obsuser && \
     echo "obsuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
     mkdir -p /home/obsuser/.config/sway && \
     echo "exec obs" > /home/obsuser/.config/sway/config && \
