@@ -73,6 +73,8 @@ fi
 
 echo "✓ LXQt session started"
 
+sleep 3
+
 echo "Configuring wayvnc..."
 mkdir -p $HOME/.config/wayvnc
 cat > $HOME/.config/wayvnc/config << EOF
@@ -91,15 +93,28 @@ if ! ps -p $WAYVNC_PID > /dev/null; then
   echo "ERROR: wayvnc failed to start"
   echo "=== wayvnc Log ==="
   cat /tmp/wayvnc.log
+  exit 1
 fi
 
-echo "✓ wayvnc started successfully on port 5900"
+if ss -tuln | grep -q ':5900'; then
+  echo "✓ wayvnc started successfully on port 5900"
+else
+  echo "WARNING: wayvnc not listening on port 5900"
+  echo "=== wayvnc Log ==="
+  cat /tmp/wayvnc.log
+fi
 
 if command -v /usr/share/novnc/utils/novnc_proxy >/dev/null 2>&1; then
   echo "Starting noVNC..."
-  /usr/share/novnc/utils/novnc_proxy --vnc localhost:5900 --listen 6080 > /tmp/novnc.log 2>&1 &
+  /usr/share/novnc/utils/novnc_proxy --web /usr/share/novnc --vnc localhost:5900 --listen 6080 > /tmp/novnc.log 2>&1 &
   sleep 2
-  echo "✓ noVNC started on port 6080"
+  
+  if ss -tuln | grep -q ':6080'; then
+    echo "✓ noVNC started on port 6080"
+  else
+    echo "ERROR: noVNC failed to bind to port 6080"
+    cat /tmp/novnc.log
+  fi
 fi
 
 echo ""
