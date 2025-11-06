@@ -28,7 +28,7 @@ RUN apt-get update && \
     fonts-dejavu fonts-noto fonts-freefont-ttf fonts-liberation fonts-roboto fonts-ubuntu fontconfig \
     dbus-x11 \
     openbox \
-    pulseaudio pulseaudio-utils pulseaudio-module-loopback pavucontrol \
+    pulseaudio pulseaudio-utils pavucontrol \
     locales \
     iproute2 \
     xclip autocutsel \
