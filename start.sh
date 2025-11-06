@@ -36,8 +36,10 @@ fi
 
 echo "✓ Xvfb started successfully on display $DISPLAY"
 
-echo "Setting keyboard layout..."
-setxkbmap de 2>/dev/null || setxkbmap us 2>/dev/null || echo "WARNING: Could not set keyboard layout"
+KB_LAYOUT=${KEYBOARD_LAYOUT:-us}
+
+echo "Setting keyboard layout to $KB_LAYOUT..."
+setxkbmap $KB_LAYOUT 2>/dev/null || setxkbmap us 2>/dev/null || echo "WARNING: Could not set keyboard layout"
 
 echo "Starting D-Bus session..."
 eval $(dbus-launch --sh-syntax)
