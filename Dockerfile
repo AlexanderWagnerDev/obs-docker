@@ -31,6 +31,7 @@ RUN apt-get update && \
     pulseaudio pulseaudio-utils pulseaudio-module-loopback pavucontrol \
     locales \
     iproute2 \
+    xclip autocutsel \
     nano vim htop net-tools iputils-ping \
     sudo \
     && \
@@ -50,8 +51,9 @@ RUN useradd -m -s /bin/bash -u 1500 obsuser && \
     mkdir -p /home/obsuser/.config/obs-studio && \
     chown -R obsuser:obsuser /home/obsuser
 
-RUN mkdir -p /home/obsuser/.local/share/applications && \
-    cat > /home/obsuser/.local/share/applications/firefox.desktop << 'EOF'
+RUN mkdir -p /home/obsuser/.local/share/applications
+
+RUN cat > /home/obsuser/.local/share/applications/firefox.desktop << 'EOF'
 [Desktop Entry]
 Name=Firefox Web Browser
 Comment=Browse the World Wide Web
@@ -61,6 +63,18 @@ Terminal=false
 Type=Application
 Categories=Network;WebBrowser;
 MimeType=text/html;text/xml;application/xhtml+xml;
+EOF
+
+RUN cat > /home/obsuser/.local/share/applications/chromium.desktop << 'EOF'
+[Desktop Entry]
+Name=Chromium Web Browser
+Comment=Access the Internet
+Exec=chromium-browser %U
+Icon=chromium-browser
+Terminal=false
+Type=Application
+Categories=Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;
 EOF
 
 RUN cat > /home/obsuser/.local/share/applications/vlc.desktop << 'EOF'
@@ -73,6 +87,17 @@ Terminal=false
 Type=Application
 Categories=AudioVideo;Player;Recorder;
 MimeType=video/mpeg;video/x-mpeg;video/x-msvideo;video/quicktime;video/x-ms-asf;video/x-ms-wmv;video/x-matroska;audio/mpeg;audio/x-wav;audio/x-mpegurl;audio/x-scpls;
+EOF
+
+RUN cat > /home/obsuser/.local/share/applications/pavucontrol.desktop << 'EOF'
+[Desktop Entry]
+Name=PulseAudio Volume Control
+Comment=Adjust the volume level
+Exec=pavucontrol
+Icon=multimedia-volume-control
+Terminal=false
+Type=Application
+Categories=AudioVideo;Audio;Mixer;GTK;
 EOF
 
 RUN mkdir -p /home/obsuser/.config/autostart && \
@@ -99,9 +124,24 @@ RUN mkdir -p /home/obsuser/.config/openbox && \
         <command>firefox</command>
       </action>
     </item>
+    <item label="Chromium">
+      <action name="Execute">
+        <command>chromium-browser</command>
+      </action>
+    </item>
     <item label="File Manager">
       <action name="Execute">
         <command>pcmanfm-qt</command>
+      </action>
+    </item>
+    <item label="VLC">
+      <action name="Execute">
+        <command>vlc</command>
+      </action>
+    </item>
+    <item label="Audio Mixer">
+      <action name="Execute">
+        <command>pavucontrol</command>
       </action>
     </item>
     <separator />
