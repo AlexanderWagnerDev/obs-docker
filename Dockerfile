@@ -12,13 +12,14 @@ RUN apt-get update && \
     lxqt-core lxqt-session lxqt-panel lxqt-runner lxqt-config \
     pcmanfm-qt qterminal \
     websockify python3-pip novnc \
-    v4l2loopback-dkms ffmpeg vlc vlc-l10n firefox \
+    v4l2loopback-dkms ffmpeg vlc vlc-l10n firefox-esr \
     libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev \
     gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
     gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools \
     gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-pulseaudio \
     mesa-utils libgl1-mesa-dri \
     fonts-dejavu fonts-noto fonts-freefont-ttf fonts-liberation \
+    fonts-ubuntu fonts-droid-fallback fonts-noto-mono fonts-noto-cjk \
     dbus-x11 \
     sudo \
     && \
