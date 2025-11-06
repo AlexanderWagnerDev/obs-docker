@@ -12,7 +12,7 @@ RUN apt-get update && \
     lxqt-core lxqt-session lxqt-panel lxqt-runner lxqt-config \
     pcmanfm-qt qterminal \
     websockify python3-pip novnc \
-    v4l2loopback-dkms ffmpeg vlc vlc-l10n firefox-esr \
+    v4l2loopback-dkms ffmpeg vlc vlc-l10n firefox \
     libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev \
     gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
     gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools \
