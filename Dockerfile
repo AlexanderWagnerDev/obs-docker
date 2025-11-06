@@ -1,6 +1,5 @@
 FROM alexanderwagnerdev/ubuntu:autoupdate
 
-ARG VNC_PASS
 ENV VNC_PASS=${VNC_PASS}
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -26,9 +25,19 @@ RUN apt-get update && \
 RUN useradd -m -s /bin/bash -u 1500 obsuser && \
     echo "obsuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
     mkdir -p /home/obsuser/.config/sway && \
-    echo "exec obs" > /home/obsuser/.config/sway/config && \
-    echo "xwayland enable" >> /home/obsuser/.config/sway/config && \
     chown -R obsuser:obsuser /home/obsuser
+
+RUN cat > /home/obsuser/.config/sway/config << 'EOF'
+xwayland enable
+
+output * {
+    mode 1920x1080
+}
+
+exec obs --platform wayland
+EOF
+
+RUN chown -R obsuser:obsuser /home/obsuser/.config/sway
 
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
