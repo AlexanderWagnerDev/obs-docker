@@ -3,18 +3,13 @@ set -e
 
 sudo cron &
 
-if [[ -z "$VNC_PASS" ]]; then
-  echo "ERROR: VNC_PASS not set!"
-  exit 1
-fi
-
 if [[ -n "$TZ" ]]; then
   sudo ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
   echo $TZ | sudo tee /etc/timezone > /dev/null
 fi
 
 echo "=========================================="
-echo "Starting LXQt Container with XWayland"
+echo "Starting OBS Container by AlexanderWagnerDev"
 echo "User: $(whoami) (UID: $(id -u))"
 echo "Locale: $LANG"
 echo "Timezone: $TZ"
@@ -79,13 +74,6 @@ if ! ps -p $LXQT_PID > /dev/null; then
 fi
 
 echo "✓ LXQt session started"
-
-echo "Starting clipboard sync..."
-autocutsel -fork
-autocutsel -selection PRIMARY -fork
-echo "✓ Clipboard sync started"
-
-sleep 3
 
 echo "Starting x11vnc with password protection..."
 x11vnc -display $DISPLAY -forever -shared -rfbport 5900 -passwd "$VNC_PASS" -xkb > /tmp/x11vnc.log 2>&1 &
