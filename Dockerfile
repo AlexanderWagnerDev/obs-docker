@@ -1,7 +1,15 @@
 FROM alexanderwagnerdev/ubuntu:autoupdate
 
 ARG VNC_PASS
+ARG LOCALE=de_DE.UTF-8
+ARG TZ=Europe/Berlin
+
 ENV VNC_PASS=${VNC_PASS}
+ENV LOCALE=${LOCALE}
+ENV TZ=${TZ}
+ENV LANG=${LOCALE}
+ENV LANGUAGE=${LOCALE%%_*}:${LOCALE%%.*}
+ENV LC_ALL=${LOCALE}
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
@@ -20,17 +28,52 @@ RUN apt-get update && \
     fonts-dejavu fonts-noto fonts-freefont-ttf fonts-liberation \
     dbus-x11 \
     openbox \
+    pulseaudio pulseaudio-utils \
+    locales \
+    iproute2 \
+    nano vim htop net-tools iputils-ping \
     sudo \
     && \
     add-apt-repository ppa:obsproject/obs-studio -y && \
     apt-get update && \
     apt-get install -y obs-studio && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN sed -i '/^#.*/s/^#//' /etc/locale.gen && \
+    locale-gen && \
+    update-locale LANG=${LOCALE}
 
 RUN useradd -m -s /bin/bash -u 1500 obsuser && \
     echo "obsuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
     mkdir -p /home/obsuser/.config/obs-studio && \
     chown -R obsuser:obsuser /home/obsuser
+
+RUN mkdir -p /home/obsuser/.local/share/applications && \
+    cat > /home/obsuser/.local/share/applications/firefox.desktop << 'EOF'
+[Desktop Entry]
+Name=Firefox Web Browser
+Comment=Browse the World Wide Web
+Exec=firefox %u
+Icon=firefox
+Terminal=false
+Type=Application
+Categories=Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;
+EOF
+
+RUN cat > /home/obsuser/.local/share/applications/vlc.desktop << 'EOF'
+[Desktop Entry]
+Name=VLC Media Player
+Comment=Read, capture, broadcast your multimedia streams
+Exec=vlc %U
+Icon=vlc
+Terminal=false
+Type=Application
+Categories=AudioVideo;Player;Recorder;
+MimeType=video/mpeg;video/x-mpeg;video/x-msvideo;video/quicktime;video/x-ms-asf;video/x-ms-wmv;video/x-matroska;audio/mpeg;audio/x-wav;audio/x-mpegurl;audio/x-scpls;
+EOF
 
 RUN mkdir -p /home/obsuser/.config/autostart && \
     cat > /home/obsuser/.config/autostart/obs.desktop << 'EOF'
@@ -41,7 +84,35 @@ Exec=obs
 X-LXQt-Need-Tray=false
 EOF
 
-RUN chown -R obsuser:obsuser /home/obsuser/.config
+RUN mkdir -p /home/obsuser/.config/openbox && \
+    cat > /home/obsuser/.config/openbox/menu.xml << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<openbox_menu xmlns="http://openbox.org/3.4/menu">
+  <menu id="root-menu" label="Openbox 3">
+    <item label="Terminal">
+      <action name="Execute">
+        <command>qterminal</command>
+      </action>
+    </item>
+    <item label="Firefox">
+      <action name="Execute">
+        <command>firefox</command>
+      </action>
+    </item>
+    <item label="File Manager">
+      <action name="Execute">
+        <command>pcmanfm-qt</command>
+      </action>
+    </item>
+    <separator />
+    <item label="Exit">
+      <action name="Exit" />
+    </item>
+  </menu>
+</openbox_menu>
+EOF
+
+RUN chown -R obsuser:obsuser /home/obsuser/.config /home/obsuser/.local
 
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
