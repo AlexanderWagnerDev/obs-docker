@@ -1,4 +1,4 @@
-FROM alexanderwagnerdev/ubuntu:latest
+FROM alexanderwagnerdev/ubuntu:autoupdate
 
 ARG VNC_PASS
 ENV DEBIAN_FRONTEND=noninteractive
@@ -11,14 +11,10 @@ RUN apt-get update && \
     apt-get install -y obs-studio && \
     rm -rf /var/lib/apt/lists/*
 
-RUN useradd -m obsuser
-COPY --chown=obsuser:obsuser start.sh /home/obsuser/start.sh
-RUN chmod +x /home/obsuser/start.sh
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
 EXPOSE 5900 6080
 HEALTHCHECK CMD curl --fail http://localhost:6080/ || exit 1
 
-USER obsuser
-ENV HOME=/home/obsuser
-
-CMD ["/home/obsuser/start.sh"]
+CMD ["/start.sh"]
