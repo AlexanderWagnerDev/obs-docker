@@ -8,7 +8,7 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
     software-properties-common wget curl git gnupg \
-    weston wayvnc xwayland \
+    wayfire wayvnc xwayland \
     lxqt-core lxqt-session lxqt-panel lxqt-runner lxqt-config \
     pcmanfm-qt qterminal \
     websockify novnc \
@@ -20,6 +20,7 @@ RUN apt-get update && \
     fonts-dejavu fonts-noto fonts-freefont-ttf fonts-liberation \
     dbus-x11 \
     qtwayland5 libqt5waylandclient5 \
+    wlroots \
     sudo \
     && \
     add-apt-repository ppa:obsproject/obs-studio -y && \
@@ -32,18 +33,19 @@ RUN useradd -m -s /bin/bash -u 1500 obsuser && \
     mkdir -p /home/obsuser/.config/obs-studio && \
     chown -R obsuser:obsuser /home/obsuser
 
-RUN mkdir -p /home/obsuser/.config && \
-    cat > /home/obsuser/.config/weston.ini << 'EOF'
+RUN mkdir -p /home/obsuser/.config/wayfire && \
+    cat > /home/obsuser/.config/wayfire.ini << 'EOF'
 [core]
-backend=headless-backend.so
-idle-time=0
+plugins = autostart decoration vswitch window-rules
 
-[output]
-name=HEADLESS-1
-mode=1920x1080
+[autostart]
+panel = lxqt-panel
+obs = obs --platform wayland
 
-[shell]
-panel-position=top
+[output:HEADLESS-1]
+mode = 1920x1080@60
+position = 0,0
+transform = normal
 EOF
 
 RUN chown -R obsuser:obsuser /home/obsuser/.config
