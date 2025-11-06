@@ -21,6 +21,10 @@ RUN apt-get update && \
     fonts-dejavu fonts-noto fonts-freefont-ttf fonts-liberation \
     fonts-ubuntu fonts-droid-fallback fonts-noto-mono fonts-noto-cjk \
     dbus-x11 \
+    qt5-qmake qtwayland5 libqt5waylandclient5 libqt5waylandcompositor5 \
+    libxcb1 libxcb-xkb1 libxcb-render0 libxcb-shape0 libxcb-randr0 \
+    libxcb-xfixes0 libxcb-sync1 libxcb-shm0 libxcb-icccm4 libxcb-keysyms1 \
+    libxcb-image0 libxcb-util1 libx11-xcb1 libxkbcommon-x11-0 \
     sudo \
     && \
     add-apt-repository ppa:obsproject/obs-studio -y && \
