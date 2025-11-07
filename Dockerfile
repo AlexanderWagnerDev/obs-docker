@@ -35,17 +35,18 @@ RUN apt-get update && \
     iproute2 \
     nano vim htop net-tools iputils-ping \
     sudo \
+    cron \
     && \
     add-apt-repository ppa:obsproject/obs-studio -y && \
     apt-get update && \
     apt-get install -y obs-studio && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
 
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-RUN sed -i '/^#.*/s/^#//' /etc/locale.gen && \
+RUN sed -i '/^#.*/s/^# //' /etc/locale.gen && \
     locale-gen && \
     update-locale LANG=${LOCALE}
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN useradd -m -s /bin/bash -u 1500 obsuser && \
     echo "obsuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
