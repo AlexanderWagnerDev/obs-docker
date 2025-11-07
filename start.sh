@@ -4,8 +4,16 @@ set -e
 sudo cron &
 
 if [[ -n "$TZ" ]]; then
+  echo "Setting timezone to $TZ..."
   sudo ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
   echo $TZ | sudo tee /etc/timezone > /dev/null
+fi
+
+if [[ -n "$LOCALE" ]]; then
+  export LANG=$LOCALE
+  export LANGUAGE=${LOCALE%%_*}:${LOCALE%%.*}
+  export LC_ALL=$LOCALE
+  sudo update-locale LANG=$LOCALE
 fi
 
 echo "=========================================="
@@ -13,6 +21,7 @@ echo "Starting OBS Container by AlexanderWagnerDev"
 echo "User: $(whoami) (UID: $(id -u))"
 echo "Locale: $LANG"
 echo "Timezone: $TZ"
+echo "Keyboard: $KEYBOARD_LAYOUT"
 echo "=========================================="
 
 export XDG_RUNTIME_DIR=/tmp/runtime-$(id -u)
@@ -127,6 +136,7 @@ echo "Display:       $DISPLAY"
 echo "Resolution:    $RESOLUTION"
 echo "Locale:        $LANG"
 echo "Timezone:      $TZ"
+echo "Keyboard:      $KEYBOARD_LAYOUT"
 echo "=========================================="
 echo ""
 
