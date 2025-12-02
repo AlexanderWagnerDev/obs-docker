@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-sudo cron &
-
 if [[ -n "$TZ" ]]; then
   echo "Setting timezone to $TZ..."
   sudo ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
