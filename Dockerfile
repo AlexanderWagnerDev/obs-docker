@@ -156,7 +156,7 @@ EOF
 
 RUN chown -R obsuser:obsuser /home/obsuser/.config /home/obsuser/.local
 
-COPY start.sh /entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 USER obsuser
