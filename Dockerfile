@@ -1,4 +1,4 @@
-FROM alexanderwagnerdev/ubuntu:autoupdate
+FROM alexanderwagnerdev/ubuntu:latest
 
 ARG VNC_PASS=OBS1234!
 ARG LOCALE=en_US.UTF-8
@@ -156,8 +156,8 @@ EOF
 
 RUN chown -R obsuser:obsuser /home/obsuser/.config /home/obsuser/.local
 
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+COPY start.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 USER obsuser
 WORKDIR /home/obsuser
@@ -165,4 +165,4 @@ WORKDIR /home/obsuser
 EXPOSE 5900 6080
 HEALTHCHECK CMD curl --fail http://localhost:6080/ || exit 1
 
-CMD ["/start.sh"]
+CMD ["/entrypoint.sh"]
