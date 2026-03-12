@@ -1,6 +1,6 @@
 # 🎥 OBS Docker
 
-[![Docker Hub](https://img.shields.io/docker/pulls/alexanderwagnerdev/obs-docker?style=flat-square)](https://hub.docker.com/r/alexanderwagnerdev/obs-docker)
+[![Docker Hub](https://img.shields.io/docker/pulls/alexanderwagnerdev/obs?style=flat-square)](https://hub.docker.com/r/alexanderwagnerdev/obs)
 [![GitHub](https://img.shields.io/github/license/AlexanderWagnerDev/obs-docker?style=flat-square)](https://github.com/AlexanderWagnerDev/obs-docker)
 
 A Docker container running **OBS Studio** inside a full desktop environment (LXQt), accessible via VNC or noVNC in the browser — perfect for headless servers, cloud streaming, and remote recording setups.
@@ -76,7 +76,7 @@ All settings are configured via environment variables:
 
 The container ships with the following applications pre-installed:
 
-- **OBS Studio** 32.1.0 — Screen recording & live streaming
+- **OBS Studio** Latest Version — Screen recording & live streaming
 - **LXQt Desktop** — Lightweight desktop environment
 - **Firefox & Chromium** — Web browsers (useful for browser sources)
 - **VLC Media Player** — Media playback
@@ -100,7 +100,7 @@ The container ships with the following applications pre-installed:
 
 ## 🔗 Links
 
-- **Docker Hub:** [alexanderwagnerdev/obs-docker](https://hub.docker.com/r/alexanderwagnerdev/obs-docker)
+- **Docker Hub:** [alexanderwagnerdev/obs-docker](https://hub.docker.com/r/alexanderwagnerdev/obs)
 - **Base Image:** [alexanderwagnerdev/ubuntu-docker](https://github.com/AlexanderWagnerDev/ubuntu-docker)
 
 ## 📄 License
@@ -184,7 +184,7 @@ Alle Einstellungen werden über Umgebungsvariablen konfiguriert:
 
 Der Container enthält folgende vorinstallierte Anwendungen:
 
-- **OBS Studio** 32.1.0 — Bildschirmaufnahme & Live-Streaming
+- **OBS Studio** Letzte Version — Bildschirmaufnahme & Live-Streaming
 - **LXQt Desktop** — Leichtgewichtige Desktop-Umgebung
 - **Firefox & Chromium** — Webbrowser (nützlich für Browser-Quellen)
 - **VLC Media Player** — Medienwiedergabe
@@ -208,7 +208,7 @@ Der Container enthält folgende vorinstallierte Anwendungen:
 
 ## 🔗 Links
 
-- **Docker Hub:** [alexanderwagnerdev/obs-docker](https://hub.docker.com/r/alexanderwagnerdev/obs-docker)
+- **Docker Hub:** [alexanderwagnerdev/obs-docker](https://hub.docker.com/r/alexanderwagnerdev/obs)
 - **Basis-Image:** [alexanderwagnerdev/ubuntu-docker](https://github.com/AlexanderWagnerDev/ubuntu-docker)
 
 ## 📄 Lizenz
