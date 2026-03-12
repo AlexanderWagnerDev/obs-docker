@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   obs-docker:
     image: alexanderwagnerdev/obs-docker:latest
