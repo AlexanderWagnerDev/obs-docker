@@ -36,7 +36,7 @@ RUN apt-get update && \
     nano vim htop net-tools iputils-ping \
     sudo \
     cron \
-    && wget https://github.com/obsproject/obs-studio/releases/download/32.0.4/OBS-Studio-32.0.4-Ubuntu-24.04-x86_64.deb -O /tmp/obs-studio.deb && \
+    && wget https://github.com/obsproject/obs-studio/releases/download/32.1.0/OBS-Studio-32.1.0-Ubuntu-24.04-x86_64.deb -O /tmp/obs-studio.deb && \
     dpkg -i /tmp/obs-studio.deb || apt-get install -f -y && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
 
