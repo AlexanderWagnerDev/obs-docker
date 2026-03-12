@@ -47,7 +47,7 @@ docker run -d \
   -p 5900:5900 \
   -p 6080:6080 \
   --shm-size=8g \
-  alexanderwagnerdev/obs-docker:latest
+  alexanderwagnerdev/obs:latest
 ```
 
 ---
@@ -155,7 +155,7 @@ docker run -d \
   -p 5900:5900 \
   -p 6080:6080 \
   --shm-size=8g \
-  alexanderwagnerdev/obs-docker:latest
+  alexanderwagnerdev/obs:latest
 ```
 
 ---
