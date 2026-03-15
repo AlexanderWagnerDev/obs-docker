@@ -15,8 +15,18 @@ ENV LANGUAGE=${LOCALE%%_*}:${LOCALE%%.*}
 ENV LC_ALL=${LOCALE}
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Generate locale early to avoid perl/locale warnings during package installs
+RUN apt-get update && \
+    apt-get install -y locales && \
+    sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen && \
+    locale-gen en_US.UTF-8 && \
+    update-locale LANG=en_US.UTF-8 && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN apt-get update && \
     apt-get upgrade -y && \
+    # Remove conflicting lxqt-branding-debian before installing lxqt-panel
+    apt-get remove -y lxqt-branding-debian || true && \
     apt-get install -y \
     software-properties-common wget curl git gnupg ca-certificates \
     xwayland x11vnc xvfb x11-xkb-utils \
@@ -32,7 +42,6 @@ RUN apt-get update && \
     dbus-x11 \
     openbox \
     pulseaudio pulseaudio-utils pavucontrol \
-    locales \
     iproute2 \
     nano vim htop net-tools iputils-ping \
     sudo \
@@ -40,10 +49,6 @@ RUN apt-get update && \
     && wget https://github.com/obsproject/obs-studio/releases/download/${OBS_VERSION}/OBS-Studio-${OBS_VERSION}-Ubuntu-24.04-x86_64.deb -O /tmp/obs-studio.deb && \
     dpkg -i /tmp/obs-studio.deb || apt-get install -f -y && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
-
-RUN sed -i '/^#.*/s/^# //' /etc/locale.gen && \
-    locale-gen && \
-    update-locale LANG=${LOCALE}
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
