@@ -39,5 +39,5 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            alexanderwagnerdev/obs:latest
-            ghcr.io/alexanderwagnerdev/obs:latest
+            alexanderwagnerdev/obs:beta
+            ghcr.io/alexanderwagnerdev/obs:beta
