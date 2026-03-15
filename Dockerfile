@@ -25,12 +25,10 @@ RUN apt-get update && \
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    # Remove conflicting lxqt-branding-debian before installing lxqt-panel
-    apt-get remove -y lxqt-branding-debian || true && \
     apt-get install -y \
     software-properties-common wget curl git gnupg ca-certificates \
     xwayland x11vnc xvfb x11-xkb-utils \
-    lxqt-core lxqt-session lxqt-panel lxqt-runner lxqt-config \
+    lxqt-core lxqt-session lxqt-runner lxqt-config \
     pcmanfm-qt qterminal \
     websockify novnc \
     ffmpeg firefox chromium python3-pip vlc vlc-l10n v4l2loopback-dkms \
@@ -46,6 +44,8 @@ RUN apt-get update && \
     nano vim htop net-tools iputils-ping \
     sudo \
     cron \
+    # Install lxqt-panel separately with --force-overwrite to handle conflict with lxqt-branding-debian
+    && apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-overwrite" lxqt-panel \
     && wget https://github.com/obsproject/obs-studio/releases/download/${OBS_VERSION}/OBS-Studio-${OBS_VERSION}-Ubuntu-24.04-x86_64.deb -O /tmp/obs-studio.deb && \
     dpkg -i /tmp/obs-studio.deb || apt-get install -f -y && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
