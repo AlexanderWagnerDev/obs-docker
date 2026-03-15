@@ -23,13 +23,15 @@ RUN apt-get update && \
     update-locale LANG=en_US.UTF-8 && \
     rm -rf /var/lib/apt/lists/*
 
-# Install all packages except lxqt-panel (conflicts with lxqt-branding-debian)
+# Install all packages - lxqt-core replaced with individual deps to exclude lxqt-panel
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
     software-properties-common wget curl git gnupg ca-certificates \
     xwayland x11vnc xvfb x11-xkb-utils \
-    lxqt-core lxqt-session lxqt-runner lxqt-config \
+    lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-policykit \
+    lxqt-qtplugin lxqt-runner lxqt-session lxqt-system-theme lxqt-themes \
+    xdg-desktop-portal-lxqt desktop-file-utils \
     pcmanfm-qt qterminal \
     websockify novnc \
     ffmpeg firefox chromium python3-pip vlc vlc-l10n v4l2loopback-dkms \
@@ -47,8 +49,8 @@ RUN apt-get update && \
     cron \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
 
-# Purge lxqt-branding-debian (pulled in by lxqt-core), then install lxqt-panel cleanly
-RUN dpkg --purge lxqt-branding-debian && \
+# Purge lxqt-branding-debian if present, then install lxqt-panel cleanly
+RUN dpkg --purge lxqt-branding-debian || true && \
     apt-get update && \
     apt-get install -y lxqt-panel && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
