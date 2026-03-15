@@ -44,8 +44,11 @@ RUN apt-get update && \
     nano vim htop net-tools iputils-ping \
     sudo \
     cron \
-    # Install lxqt-panel separately with --force-overwrite to handle conflict with lxqt-branding-debian
-    && apt-get install -y --no-install-recommends -o Dpkg::Options::="--force-overwrite" lxqt-panel \
+    # Download lxqt-panel manually and force-overwrite the conflict with lxqt-branding-debian
+    && apt-get download lxqt-panel \
+    && dpkg --force-overwrite -i lxqt-panel_*.deb \
+    && apt-get install -f -y \
+    && rm -f lxqt-panel_*.deb \
     && wget https://github.com/obsproject/obs-studio/releases/download/${OBS_VERSION}/OBS-Studio-${OBS_VERSION}-Ubuntu-24.04-x86_64.deb -O /tmp/obs-studio.deb && \
     dpkg -i /tmp/obs-studio.deb || apt-get install -f -y && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
