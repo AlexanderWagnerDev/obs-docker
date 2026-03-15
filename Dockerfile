@@ -44,14 +44,15 @@ RUN apt-get update && \
     nano vim htop net-tools iputils-ping \
     sudo \
     cron \
-    # Download lxqt-panel manually and force-overwrite the conflict with lxqt-branding-debian
+    # Purge lxqt-branding-debian after lxqt-core pulled it in, then force-install lxqt-panel
+    && dpkg --purge lxqt-branding-debian \
     && apt-get download lxqt-panel \
     && dpkg --force-overwrite -i lxqt-panel_*.deb \
     && apt-get install -f -y \
     && rm -f lxqt-panel_*.deb \
-    && wget https://github.com/obsproject/obs-studio/releases/download/${OBS_VERSION}/OBS-Studio-${OBS_VERSION}-Ubuntu-24.04-x86_64.deb -O /tmp/obs-studio.deb && \
-    dpkg -i /tmp/obs-studio.deb || apt-get install -f -y && \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
+    && wget https://github.com/obsproject/obs-studio/releases/download/${OBS_VERSION}/OBS-Studio-${OBS_VERSION}-Ubuntu-24.04-x86_64.deb -O /tmp/obs-studio.deb \
+    && dpkg -i /tmp/obs-studio.deb || apt-get install -f -y \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
