@@ -1,9 +1,10 @@
-FROM alexanderwagnerdev/ubuntu:24.04
+FROM alexanderwagnerdev/ubuntu:26.04
 
 ARG VNC_PASS=OBS1234!
 ARG LOCALE=en_US.UTF-8
 ARG TZ=UTC
 ARG KEYBOARD_LAYOUT=us
+ARG OBS_VERSION=32.1.0
 
 ENV VNC_PASS=${VNC_PASS}
 ENV LOCALE=${LOCALE}
@@ -17,12 +18,12 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
-    software-properties-common wget curl git gnupg \
+    software-properties-common wget curl git gnupg ca-certificates \
     xwayland x11vnc xvfb x11-xkb-utils \
     lxqt-core lxqt-session lxqt-panel lxqt-runner lxqt-config \
     pcmanfm-qt qterminal \
     websockify novnc \
-    ffmpeg firefox chromium-browser python3-pip vlc vlc-l10n v4l2loopback-dkms \
+    ffmpeg firefox chromium python3-pip vlc vlc-l10n v4l2loopback-dkms \
     gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
     gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools \
     gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-pulseaudio \
@@ -36,7 +37,7 @@ RUN apt-get update && \
     nano vim htop net-tools iputils-ping \
     sudo \
     cron \
-    && wget https://github.com/obsproject/obs-studio/releases/download/32.1.0/OBS-Studio-32.1.0-Ubuntu-24.04-x86_64.deb -O /tmp/obs-studio.deb && \
+    && wget https://github.com/obsproject/obs-studio/releases/download/${OBS_VERSION}/OBS-Studio-${OBS_VERSION}-Ubuntu-24.04-x86_64.deb -O /tmp/obs-studio.deb && \
     dpkg -i /tmp/obs-studio.deb || apt-get install -f -y && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
 
@@ -69,8 +70,8 @@ RUN cat > /home/obsuser/.local/share/applications/chromium.desktop << 'EOF'
 [Desktop Entry]
 Name=Chromium Web Browser
 Comment=Access the Internet
-Exec=chromium-browser %U
-Icon=chromium-browser
+Exec=chromium %U
+Icon=chromium
 Terminal=false
 Type=Application
 Categories=Network;WebBrowser;
@@ -126,7 +127,7 @@ RUN mkdir -p /home/obsuser/.config/openbox && \
     </item>
     <item label="Chromium">
       <action name="Execute">
-        <command>chromium-browser</command>
+        <command>chromium</command>
       </action>
     </item>
     <item label="File Manager">
