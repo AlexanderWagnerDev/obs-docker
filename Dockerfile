@@ -23,6 +23,7 @@ RUN apt-get update && \
     update-locale LANG=en_US.UTF-8 && \
     rm -rf /var/lib/apt/lists/*
 
+# Install all packages except lxqt-panel (conflicts with lxqt-branding-debian)
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
@@ -44,17 +45,18 @@ RUN apt-get update && \
     nano vim htop net-tools iputils-ping \
     sudo \
     cron \
-    # Purge lxqt-branding-debian (pulled in by lxqt-core), clear apt cache,
-    # then download lxqt-panel fresh to /tmp and force-install via dpkg
-    && dpkg --purge lxqt-branding-debian \
-    && rm -f /var/cache/apt/archives/lxqt-panel_*.deb \
-    && apt-get download -o Dir::Cache::Archives=/tmp lxqt-panel \
-    && dpkg --force-overwrite -i /tmp/lxqt-panel_*.deb \
-    && apt-get install -f -y \
-    && rm -f /tmp/lxqt-panel_*.deb \
-    && wget https://github.com/obsproject/obs-studio/releases/download/${OBS_VERSION}/OBS-Studio-${OBS_VERSION}-Ubuntu-24.04-x86_64.deb -O /tmp/obs-studio.deb \
-    && dpkg -i /tmp/obs-studio.deb || apt-get install -f -y \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
+
+# Purge lxqt-branding-debian (pulled in by lxqt-core), then install lxqt-panel cleanly
+RUN dpkg --purge lxqt-branding-debian && \
+    apt-get update && \
+    apt-get install -y lxqt-panel && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+
+# Install OBS Studio
+RUN wget https://github.com/obsproject/obs-studio/releases/download/${OBS_VERSION}/OBS-Studio-${OBS_VERSION}-Ubuntu-24.04-x86_64.deb -O /tmp/obs-studio.deb && \
+    dpkg -i /tmp/obs-studio.deb || apt-get install -f -y && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
