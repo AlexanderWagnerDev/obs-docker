@@ -4,7 +4,6 @@ ARG VNC_PASS=OBS1234!
 ARG LOCALE=en_US.UTF-8
 ARG TZ=UTC
 ARG KEYBOARD_LAYOUT=us
-ARG OBS_VERSION=32.1.0
 
 ENV VNC_PASS=${VNC_PASS}
 ENV LOCALE=${LOCALE}
@@ -37,9 +36,10 @@ RUN apt-get update && \
     nano vim htop net-tools iputils-ping \
     sudo \
     cron \
-    && wget https://github.com/obsproject/obs-studio/releases/download/${OBS_VERSION}/OBS-Studio-${OBS_VERSION}-Ubuntu-24.04-x86_64.deb -O /tmp/obs-studio.deb && \
-    dpkg -i /tmp/obs-studio.deb || apt-get install -f -y && \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
+    && add-apt-repository -y ppa:obsproject/obs-studio \
+    && apt-get update \
+    && apt-get install -y obs-studio \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
 
 RUN sed -i '/^#.*/s/^# //' /etc/locale.gen && \
     locale-gen && \
