@@ -23,12 +23,10 @@ RUN apt-get update && \
     update-locale LANG=en_US.UTF-8 && \
     rm -rf /var/lib/apt/lists/*
 
-# Add OBS PPA (supports Ubuntu 24.04/25.10; works on 26.04 via compatibility)
-# and Chromium PPA for a snap-free .deb install
+# Add OBS PPA
 RUN apt-get update && \
     apt-get install -y software-properties-common gnupg ca-certificates curl wget && \
     add-apt-repository -y ppa:obsproject/obs-studio && \
-    add-apt-repository -y ppa:saiarcot895/chromium-beta && \
     rm -rf /var/lib/apt/lists/*
 
 # Install all packages
@@ -46,7 +44,6 @@ RUN apt-get update && \
     pcmanfm-qt qterminal \
     websockify novnc \
     ffmpeg firefox python3-pip vlc vlc-l10n \
-    chromium-browser \
     gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
     gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools \
     gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-pulseaudio \
@@ -87,18 +84,6 @@ Terminal=false
 Type=Application
 Categories=Network;WebBrowser;
 MimeType=text/html;text/xml;application/xhtml+xml;
-EOF
-
-RUN cat > /home/obsuser/.local/share/applications/chromium.desktop << 'EOF'
-[Desktop Entry]
-Name=Chromium Web Browser
-Comment=Access the Internet
-Exec=chromium-browser %U
-Icon=chromium-browser
-Terminal=false
-Type=Application
-Categories=Network;WebBrowser;
-MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;
 EOF
 
 RUN cat > /home/obsuser/.local/share/applications/vlc.desktop << 'EOF'
@@ -146,11 +131,6 @@ RUN mkdir -p /home/obsuser/.config/openbox && \
     <item label="Firefox">
       <action name="Execute">
         <command>firefox</command>
-      </action>
-    </item>
-    <item label="Chromium">
-      <action name="Execute">
-        <command>chromium-browser</command>
       </action>
     </item>
     <item label="File Manager">
