@@ -4,7 +4,6 @@ ARG VNC_PASS=OBS1234!
 ARG LOCALE=en_US.UTF-8
 ARG TZ=UTC
 ARG KEYBOARD_LAYOUT=us
-ARG OBS_VERSION=32.1.0
 
 ENV VNC_PASS=${VNC_PASS}
 ENV LOCALE=${LOCALE}
@@ -15,23 +14,26 @@ ENV LANGUAGE=${LOCALE%%_*}:${LOCALE%%.*}
 ENV LC_ALL=${LOCALE}
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Generate locale early to avoid perl/locale warnings during package installs
+# Ubuntu 26.04: lxqt-branding-debian conflicts with lxqt-panel over /etc/xdg/lxqt/panel.conf
 RUN apt-get update && \
-    apt-get install -y locales && \
-    sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen && \
-    locale-gen en_US.UTF-8 && \
-    update-locale LANG=en_US.UTF-8 && \
+    apt-get purge -y lxqt-branding-debian 2>/dev/null || true && \
     rm -rf /var/lib/apt/lists/*
 
-# Install all packages - lxqt-core replaced with individual deps to exclude lxqt-panel
+# Generate locales before package installs to avoid perl/locale warnings
+RUN apt-get update && \
+    apt-get install -y locales && \
+    sed -i '/^#.*/s/^# //' /etc/locale.gen && \
+    locale-gen && \
+    update-locale LANG=${LOCALE} && \
+    rm -rf /var/lib/apt/lists/*
+
+# --no-install-recommends avoids pulling lxqt-branding-debian back in
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
     software-properties-common wget curl git gnupg ca-certificates \
     xwayland x11vnc xvfb x11-xkb-utils \
-    lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-policykit \
-    lxqt-qtplugin lxqt-runner lxqt-session lxqt-system-theme lxqt-themes \
-    xdg-desktop-portal-lxqt desktop-file-utils \
+    lxqt-core \
     pcmanfm-qt qterminal \
     websockify novnc \
     ffmpeg firefox chromium python3-pip vlc vlc-l10n v4l2loopback-dkms \
@@ -43,22 +45,12 @@ RUN apt-get update && \
     dbus-x11 \
     openbox \
     pulseaudio pulseaudio-utils pavucontrol \
+    obs-studio \
     iproute2 \
     nano vim htop net-tools iputils-ping \
     sudo \
     cron \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
-
-# Purge lxqt-branding-debian if present, then install lxqt-panel cleanly
-RUN dpkg --purge lxqt-branding-debian || true && \
-    apt-get update && \
-    apt-get install -y lxqt-panel && \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
-
-# Install OBS Studio
-RUN wget https://github.com/obsproject/obs-studio/releases/download/${OBS_VERSION}/OBS-Studio-${OBS_VERSION}-Ubuntu-24.04-x86_64.deb -O /tmp/obs-studio.deb && \
-    dpkg -i /tmp/obs-studio.deb || apt-get install -f -y && \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
