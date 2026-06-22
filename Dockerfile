@@ -23,18 +23,30 @@ RUN apt-get update && \
     update-locale LANG=en_US.UTF-8 && \
     rm -rf /var/lib/apt/lists/*
 
-# Install all packages - lxqt-core replaced with individual deps to exclude lxqt-panel
+# Add OBS PPA (supports Ubuntu 24.04/25.10; works on 26.04 via compatibility)
+# and Chromium PPA for a snap-free .deb install
+RUN apt-get update && \
+    apt-get install -y software-properties-common gnupg ca-certificates curl wget && \
+    add-apt-repository -y ppa:obsproject/obs-studio && \
+    add-apt-repository -y ppa:saiarcot895/chromium-beta && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install all packages
+# Note: xorg + xserver-xorg-core are required on Ubuntu 26.04 because the default
+# desktop session is Wayland-only; Xvfb and x11vnc still need the Xorg server packages.
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
-    software-properties-common wget curl git gnupg ca-certificates \
+    wget curl git gnupg ca-certificates \
+    xorg xserver-xorg-core \
     xwayland x11vnc xvfb x11-xkb-utils \
     lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-policykit \
     lxqt-qtplugin lxqt-runner lxqt-session lxqt-system-theme lxqt-themes \
     xdg-desktop-portal-lxqt desktop-file-utils \
     pcmanfm-qt qterminal \
     websockify novnc \
-    ffmpeg firefox chromium python3-pip vlc vlc-l10n v4l2loopback-dkms \
+    ffmpeg firefox python3-pip vlc vlc-l10n \
+    chromium-browser \
     gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
     gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools \
     gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-pulseaudio \
@@ -47,6 +59,7 @@ RUN apt-get update && \
     nano vim htop net-tools iputils-ping \
     sudo \
     cron \
+    obs-studio \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
 
 # Purge lxqt-branding-debian if present, then install lxqt-panel cleanly
@@ -54,11 +67,6 @@ RUN dpkg --purge lxqt-branding-debian || true && \
     apt-get update && \
     apt-get install -y lxqt-panel && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
-
-# Install OBS Studio
-RUN wget https://github.com/obsproject/obs-studio/releases/download/${OBS_VERSION}/OBS-Studio-${OBS_VERSION}-Ubuntu-24.04-x86_64.deb -O /tmp/obs-studio.deb && \
-    dpkg -i /tmp/obs-studio.deb || apt-get install -f -y && \
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* /tmp/* /var/tmp/*
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
@@ -85,8 +93,8 @@ RUN cat > /home/obsuser/.local/share/applications/chromium.desktop << 'EOF'
 [Desktop Entry]
 Name=Chromium Web Browser
 Comment=Access the Internet
-Exec=chromium %U
-Icon=chromium
+Exec=chromium-browser %U
+Icon=chromium-browser
 Terminal=false
 Type=Application
 Categories=Network;WebBrowser;
@@ -142,7 +150,7 @@ RUN mkdir -p /home/obsuser/.config/openbox && \
     </item>
     <item label="Chromium">
       <action name="Execute">
-        <command>chromium</command>
+        <command>chromium-browser</command>
       </action>
     </item>
     <item label="File Manager">
