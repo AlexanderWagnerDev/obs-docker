@@ -1,4 +1,4 @@
-FROM alexanderwagnerdev/ubuntu:24.04
+FROM alexanderwagnerdev/ubuntu:26.04
 
 ARG VNC_PASS=OBS1234!
 ARG LOCALE=en_US.UTF-8
