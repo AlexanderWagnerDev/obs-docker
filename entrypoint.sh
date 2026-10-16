@@ -36,8 +36,8 @@ XVFB_PID=$!
 sleep 3
 
 if ! ps -p $XVFB_PID > /dev/null; then
-  echo "ERROR: Xvfb failed to start"
-  cat /tmp/xvfb.log
+  echo "ERROR: Xvfb failed to start" >&2
+  cat /tmp/xvfb.log >&2
   exit 1
 fi
 
@@ -96,8 +96,8 @@ X11VNC_PID=$!
 sleep 3
 
 if ! ps -p $X11VNC_PID > /dev/null; then
-  echo "ERROR: x11vnc failed to start"
-  cat /tmp/x11vnc.log
+  echo "ERROR: x11vnc failed to start" >&2
+  cat /tmp/x11vnc.log >&2
   exit 1
 fi
 
@@ -116,8 +116,8 @@ if command -v /usr/share/novnc/utils/novnc_proxy >/dev/null 2>&1; then
   if ss -tuln | grep -q ':6080'; then
     echo "✓ noVNC started on port 6080"
   else
-    echo "ERROR: noVNC failed to bind to port 6080"
-    cat /tmp/novnc.log
+    echo "ERROR: noVNC failed to bind to port 6080" >&2
+    cat /tmp/novnc.log >&2
   fi
 fi
 
