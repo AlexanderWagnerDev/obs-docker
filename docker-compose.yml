@@ -2,7 +2,7 @@ services:
   obs-docker:
     image: alexanderwagnerdev/obs:beta
     container_name: obs-docker
-    restart: unless-stopped
+    restart: always
     environment:
       - VNC_PASS=${VNC_PASS}
       - LOCALE=${LOCALE}
