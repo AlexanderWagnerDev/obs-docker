@@ -1,6 +1,6 @@
 services:
   obs-docker:
-    image: alexanderwagnerdev/obs-docker:latest
+    image: alexanderwagnerdev/obs:beta
     container_name: obs-docker
     restart: unless-stopped
     environment:
