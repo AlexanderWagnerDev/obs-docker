@@ -22,7 +22,7 @@ Stream, record and produce from a server with **no monitor, no GPU and no local 
 > **In a hurry?** Run the one-liner below and open <http://localhost:6080>. No client, no install, no desktop required.
 
 ```bash
-docker run -d --name obs-docker --restart unless-stopped \
+docker run -d --name obs-docker --restart always \
   -e VNC_PASS='change-me' \
   -p 5900:5900 -p 6080:6080 \
   --shm-size=8g \
@@ -100,7 +100,7 @@ services:
   obs-docker:
     image: alexanderwagnerdev/obs:latest
     container_name: obs-docker
-    restart: unless-stopped
+    restart: always
     environment:
       - VNC_PASS=${VNC_PASS}
       - LOCALE=${LOCALE}
@@ -119,7 +119,7 @@ services:
 ```bash
 docker run -d \
   --name obs-docker \
-  --restart unless-stopped \
+  --restart always \
   -e VNC_PASS='change-me' \
   -e TZ=Europe/Vienna \
   -e LOCALE=de_AT.UTF-8 \
