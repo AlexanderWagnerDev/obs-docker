@@ -1,0 +1,52 @@
+version: 2
+updates:
+  # legacy
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "legacy"
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "legacy"
+  - package-ecosystem: "docker-compose"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "legacy"
+
+  # main
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "main"
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "main"
+  - package-ecosystem: "docker-compose"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "main"
+
+  # beta
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "beta"
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "beta"
+  - package-ecosystem: "docker-compose"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "beta"
