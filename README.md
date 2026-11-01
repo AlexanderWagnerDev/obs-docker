@@ -16,6 +16,12 @@ Stream, record and produce from a server with **no monitor, no GPU and no local 
 
 </div>
 
+<div align="center">
+  <img src="docs/screenshots/obs-desktop.png" alt="OBS Studio running in the container's LXQt desktop" width="100%">
+  <br>
+  <sub>OBS Studio running inside the container — no local desktop required.</sub>
+</div>
+
 ---
 
 > [!TIP]
@@ -168,6 +174,12 @@ cp .env.example .env
 | VNC client | `your-ip:5900` | Lower latency, better for long sessions |
 
 > OBS Studio launches automatically when the container starts.
+
+<div align="center">
+  <img src="docs/screenshots/novnc.png" alt="The same desktop streamed to a browser via noVNC" width="100%">
+  <br>
+  <sub>The same desktop in your browser via noVNC on port 6080.</sub>
+</div>
 
 ---
 
