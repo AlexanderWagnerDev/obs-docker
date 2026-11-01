@@ -89,8 +89,8 @@ echo "✓ LXQt session started"
 
 sleep 3
 
-echo "Starting x11vnc with password protection and caching..."
-x11vnc -display $DISPLAY -forever -shared -rfbport 5900 -passwd "$VNC_PASS" -xkb -ncache 10 -ncache_cr > /tmp/x11vnc.log 2>&1 &
+echo "Starting x11vnc with password protection..."
+x11vnc -display $DISPLAY -forever -shared -rfbport 5900 -passwd "$VNC_PASS" -xkb > /tmp/x11vnc.log 2>&1 &
 X11VNC_PID=$!
 
 sleep 3
@@ -102,7 +102,7 @@ if ! ps -p $X11VNC_PID > /dev/null; then
 fi
 
 if ss -tuln | grep -q ':5900'; then
-  echo "✓ x11vnc started successfully on port 5900 (password protected, caching enabled)"
+  echo "✓ x11vnc started successfully on port 5900 (password protected)"
 else
   echo "WARNING: x11vnc not listening on port 5900"
   cat /tmp/x11vnc.log
