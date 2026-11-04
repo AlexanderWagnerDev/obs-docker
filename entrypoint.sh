@@ -14,12 +14,49 @@ if [[ -n "$LOCALE" ]]; then
   sudo update-locale LANG=$LOCALE
 fi
 
+# --- GPU detection -----------------------------------------------------------
+# The driver comes from the host; here we only pick the matching VA-API backend.
+detect_gpu_vendor() {
+  if [[ -e /dev/nvidiactl || -e /dev/nvidia0 ]]; then
+    echo "nvidia"
+    return
+  fi
+  local vendor_file
+  for vendor_file in /sys/class/drm/card*/device/vendor; do
+    [[ -r "$vendor_file" ]] || continue
+    case "$(cat "$vendor_file" 2>/dev/null)" in
+      0x1002) echo "amd";   return ;;
+      0x8086) echo "intel"; return ;;
+    esac
+  done
+  echo "none"
+}
+
+GPU_VENDOR=${GPU_VENDOR:-$(detect_gpu_vendor)}
+export GPU_VENDOR
+
+if [[ -z "$LIBVA_DRIVER_NAME" ]]; then
+  case "$GPU_VENDOR" in
+    amd)    export LIBVA_DRIVER_NAME=radeonsi ;;
+    intel)  export LIBVA_DRIVER_NAME=iHD ;;
+    nvidia) export LIBVA_DRIVER_NAME=nvidia ;;
+  esac
+fi
+
+# Older Intel GPUs (Gen7 and below) need i965 instead of iHD.
+if [[ "$GPU_VENDOR" == "intel" && "$LIBVA_DRIVER_NAME" == "iHD" ]] && command -v vainfo >/dev/null 2>&1; then
+  if ! vainfo --display drm >/dev/null 2>&1; then
+    export LIBVA_DRIVER_NAME=i965
+  fi
+fi
+
 echo "=========================================="
 echo "Starting OBS Container by AlexanderWagnerDev"
 echo "User: $(whoami) (UID: $(id -u))"
 echo "Locale: $LANG"
 echo "Timezone: $TZ"
 echo "Keyboard: $KEYBOARD_LAYOUT"
+echo "GPU: ${GPU_VENDOR}${LIBVA_DRIVER_NAME:+ (VA-API: $LIBVA_DRIVER_NAME)}"
 echo "=========================================="
 
 export XDG_RUNTIME_DIR=/tmp/runtime-$(id -u)
@@ -135,6 +172,7 @@ echo "Resolution:    $RESOLUTION"
 echo "Locale:        $LANG"
 echo "Timezone:      $TZ"
 echo "Keyboard:      $KEYBOARD_LAYOUT"
+echo "GPU:           ${GPU_VENDOR}${LIBVA_DRIVER_NAME:+ (VA-API: $LIBVA_DRIVER_NAME)}"
 echo "=========================================="
 echo ""
 

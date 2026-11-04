@@ -65,6 +65,19 @@ RUN dpkg --purge lxqt-branding-debian || true && \
     apt-get install -y lxqt-panel && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
+# --- GPU userspace (all vendors) ---------------------------------------------
+# Drivers come from the host; this branch only ships the userspace stacks.
+# On Ubuntu 26.04 the radeonsi VA-API driver ships inside mesa-libgallium,
+# and intel-media-va-driver conflicts with its -non-free counterpart.
+# The VA-API backend is selected at runtime in entrypoint.sh.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libva2 libva-drm2 libva-x11-2 libvdpau1 libegl1 libglx0 vainfo \
+    mesa-libgallium mesa-vulkan-drivers \
+    intel-media-va-driver-non-free i965-va-driver \
+    nvidia-vaapi-driver \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN useradd -m -s /bin/bash -u 1500 obsuser && \
