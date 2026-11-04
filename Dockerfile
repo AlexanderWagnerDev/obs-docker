@@ -65,6 +65,15 @@ RUN dpkg --purge lxqt-branding-debian || true && \
     apt-get install -y lxqt-panel && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
+# --- NVIDIA userspace --------------------------------------------------------
+# The driver itself is injected by the NVIDIA Container Toolkit at runtime.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libva2 libva-drm2 libva-x11-2 libvdpau1 libegl1 libglx0 \
+    nvidia-vaapi-driver \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+
+ENV LIBVA_DRIVER_NAME=nvidia
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN useradd -m -s /bin/bash -u 1500 obsuser && \

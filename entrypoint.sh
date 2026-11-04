@@ -20,6 +20,7 @@ echo "User: $(whoami) (UID: $(id -u))"
 echo "Locale: $LANG"
 echo "Timezone: $TZ"
 echo "Keyboard: $KEYBOARD_LAYOUT"
+echo "VA-API: $LIBVA_DRIVER_NAME"
 echo "=========================================="
 
 export XDG_RUNTIME_DIR=/tmp/runtime-$(id -u)
@@ -135,6 +136,7 @@ echo "Resolution:    $RESOLUTION"
 echo "Locale:        $LANG"
 echo "Timezone:      $TZ"
 echo "Keyboard:      $KEYBOARD_LAYOUT"
+echo "VA-API:        $LIBVA_DRIVER_NAME"
 echo "=========================================="
 echo ""
 
