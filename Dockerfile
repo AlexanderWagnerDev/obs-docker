@@ -65,6 +65,16 @@ RUN dpkg --purge lxqt-branding-debian || true && \
     apt-get install -y lxqt-panel && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
+# --- AMD userspace -----------------------------------------------------------
+# amdgpu comes from the host kernel, /dev/dri is passed through.
+# On Ubuntu 26.04 the radeonsi VA-API driver ships inside mesa-libgallium.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libva2 libva-drm2 libva-x11-2 vainfo \
+    mesa-libgallium mesa-vulkan-drivers \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+
+ENV LIBVA_DRIVER_NAME=radeonsi
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN useradd -m -s /bin/bash -u 1500 obsuser && \
