@@ -14,12 +14,20 @@ if [[ -n "$LOCALE" ]]; then
   sudo update-locale LANG=$LOCALE
 fi
 
+# Older Intel GPUs (Gen7 and below) need i965 instead of iHD.
+if [[ "$LIBVA_DRIVER_NAME" == "iHD" ]] && command -v vainfo >/dev/null 2>&1; then
+  if ! vainfo --display drm >/dev/null 2>&1; then
+    export LIBVA_DRIVER_NAME=i965
+  fi
+fi
+
 echo "=========================================="
 echo "Starting OBS Container by AlexanderWagnerDev"
 echo "User: $(whoami) (UID: $(id -u))"
 echo "Locale: $LANG"
 echo "Timezone: $TZ"
 echo "Keyboard: $KEYBOARD_LAYOUT"
+echo "VA-API: $LIBVA_DRIVER_NAME"
 echo "=========================================="
 
 export XDG_RUNTIME_DIR=/tmp/runtime-$(id -u)
@@ -135,6 +143,7 @@ echo "Resolution:    $RESOLUTION"
 echo "Locale:        $LANG"
 echo "Timezone:      $TZ"
 echo "Keyboard:      $KEYBOARD_LAYOUT"
+echo "VA-API:        $LIBVA_DRIVER_NAME"
 echo "=========================================="
 echo ""
 
