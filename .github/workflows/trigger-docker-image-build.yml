@@ -1,0 +1,54 @@
+name: Trigger Docker Image Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      images:
+        description: Which images to build
+        type: choice
+        default: latest
+        options:
+          - latest
+          - beta
+          - legacy
+          - all
+
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      branches: ${{ steps.set.outputs.branches }}
+    steps:
+      - id: set
+        env:
+          IMAGES: ${{ inputs.images }}
+        run: |
+          case "$IMAGES" in
+            beta)   branches='["beta"]' ;;
+            legacy) branches='["legacy"]' ;;
+            all)    branches='["main","beta","legacy","gpu","amd","intel","nvidia"]' ;;
+            *)      branches='["main","gpu","amd","intel","nvidia"]' ;;
+          esac
+          echo "branches=$branches" >> "$GITHUB_OUTPUT"
+
+  trigger:
+    needs: matrix
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: ${{ fromJSON(needs.matrix.outputs.branches) }}
+    steps:
+      - name: Trigger docker-image-build.yml on ${{ matrix.branch }}
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'docker-image-build.yml',
+              ref: '${{ matrix.branch }}'
+            });
